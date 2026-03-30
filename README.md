@@ -12,13 +12,9 @@ Grande parte dos conteúdos de ETL mostram um fluxo muito limpo:
 
 > extrair → transformar → carregar
 
-Na prática, não funciona assim.
+Acontece que, na prática, não funciona assim.
 
-No dia a dia, os dados:
-- não batem
-- não estão completos
-- seguem regras que ninguém documentou direito
-- e às vezes simplesmente não fazem sentido
+No dia a dia, os dados não batem, não estão completos, seguem regras que ninguém documentou direit e às vezes simplesmente não fazem sentido
 
 Esse ETL foi construído exatamente nesse cenário.
 
