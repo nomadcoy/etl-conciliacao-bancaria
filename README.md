@@ -21,5 +21,3 @@ Para rodar, basta criar um arquivo .env baseado no .env.example, instalar as dep
 pip install -r requirements.txt
 
 e executar o script principal.
-
-Se quiser, posso fazer uma versão ainda mais enxuta e “blog-like”, que conte a história de forma mais narrativa, sem listas e subtítulos, para ficar bem leve de ler no GitHub. Quer que eu faça essa versão também?
