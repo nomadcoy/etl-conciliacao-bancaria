@@ -1,125 +1,25 @@
-# ETL de Conciliação Bancária
+ETL de Conciliação Bancária
 
-Esse projeto nasceu de um problema real: acompanhar diariamente o nível de conciliação entre o saldo do ERP (Sankhya) e o saldo do banco, no instituto em que trabalho como analista de dados.
+Este projeto surgiu de um problema real no meu dia a dia como analista de dados: acompanhar diariamente o nível de conciliação entre o saldo registrado no ERP (Sankhya) e o saldo do banco no instituto em que trabalho. À primeira vista, pode parecer simples, mas na prática os dados raramente cooperam.
 
-Pode parecer simples, mas não é.
+A maioria dos conteúdos sobre ETL mostra o fluxo como algo limpo e linear: extrair, transformar, carregar. No mundo real, os dados chegam incompletos, inconsistentes, com regras não documentadas ou até mesmo sem sentido aparente. Foi nesse cenário que este ETL foi construído, para lidar com a realidade de dados imperfeitos e processos complexos.
 
----
+O objetivo principal é medir quantas contas estão conciliadas corretamente. Mas chegar a esse indicador exigiu lidar com nuances que vão além de uma simples comparação de números: diferenças entre saldo disponível e saldo real, tarifas pendentes que afetam o valor, movimentações acumuladas ao longo do tempo, dias sem informações, e pequenas discrepâncias que devem ser consideradas aceitáveis.
 
-## Por que esse projeto?
+Na etapa de extração, uma query relativamente complexa acessa o SQL Server, utilizando várias CTEs e junções entre tabelas do Sankhya, aplicando regras específicas para calcular o saldo de cada conta. Nem tudo vem pronto: é necessário reconstruir o saldo diário a partir dos lançamentos, calcular o saldo acumulado com SUM OVER e gerar datas manualmente através de CTEs recursivas.
 
-Grande parte dos conteúdos de ETL mostram um fluxo muito limpo:
+Depois, na fase de conciliação, o saldo do sistema é comparado com o saldo do banco, aplicando tolerâncias para pequenas diferenças e lidando com dados faltantes. Em Python, o script ainda trata valores especiais, identifica quais contas estão realmente em atraso e calcula o indicador final.
 
-> extrair → transformar → carregar
+O resultado vai para o BigQuery, pronto para ser utilizado em análises e dashboards. Paralelamente, o script registra logs no banco, indicando se a execução foi bem-sucedida ou se houve algum erro, garantindo rastreabilidade e monitoramento do ETL.
 
-Acontece que, na prática, não funciona assim.
+Ao final, o ETL produz um indicador consolidado com o total de contas, o número de contas em atraso e o percentual de atraso, oferecendo uma visão diária confiável sobre a conciliação bancária.
 
-No dia a dia, os dados não batem, não estão completos, seguem regras que ninguém documentou direit e às vezes simplesmente não fazem sentido
+O projeto utiliza Python, Pandas para manipulação de dados, SQL Server para extração e BigQuery para armazenamento e análise.
 
-Esse ETL foi construído exatamente nesse cenário.
+Para rodar, basta criar um arquivo .env baseado no .env.example, instalar as dependências com:
 
----
-
-## O problema
-
-A ideia é medir quantas contas estão com a conciliação em dia.
-
-Só que pra chegar nisso, precisei lidar com coisas como:
-
-- diferença entre saldo disponível e saldo real  
-- tarifas pendentes que impactam o valor  
-- movimentações que precisam ser acumuladas ao longo do tempo  
-- dias sem informação  
-- pequenas diferenças que precisam ser consideradas "ok"  
-
-Ou seja: não é só comparar dois números.
-
----
-
-## O que o ETL faz
-
-### Extração (SQL Server)
-
-A query já começa longe de ser simples:
-
-- várias CTEs
-- junções entre tabelas do Sankhya
-- regras específicas pra calcular saldo
-
----
-
-### Reconstrução de dados
-
-Nem tudo vinha pronto.
-
-Foi necessário:
-
-- reconstruir o saldo diário a partir dos lançamentos  
-- calcular saldo acumulado com `SUM OVER`  
-- gerar datas manualmente (CTE recursiva)  
-
----
-
-### Conciliação
-
-Aqui entra a parte mais "negócio":
-
-- comparar saldo do sistema vs banco  
-- aplicar tolerância (diferenças pequenas são aceitáveis)  
-- lidar com dados faltantes  
-
----
-
-### Regras em Python
-
-Depois do SQL, ainda tem tratamento em Python:
-
-- lidar com valores tipo "mais que X meses"  
-- identificar o que é atraso de fato  
-- calcular o indicador final  
-
----
-
-### Carga (BigQuery)
-
-O resultado vai pro BigQuery, pra ser usado em análise e dashboard.
-
----
-
-### Logging
-
-O script registra no banco:
-
-- se rodou com sucesso  
-- se deu erro  
-
-Porque sem isso, você não sabe quando o ETL quebrou.
-
----
-
-## Indicador gerado
-
-No final, o ETL produz:
-
-- total de contas  
-- contas em atraso  
-- percentual de atraso  
-
----
-
-## Tecnologias
-
-- Python
-- Pandas
-- SQL Server
-- BigQuery
-
----
-
-## Como rodar
-
-1. Criar um `.env` baseado no `.env.example`
-2. Instalar dependências:
-
-```bash
 pip install -r requirements.txt
+
+e executar o script principal.
+
+Se quiser, posso fazer uma versão ainda mais enxuta e “blog-like”, que conte a história de forma mais narrativa, sem listas e subtítulos, para ficar bem leve de ler no GitHub. Quer que eu faça essa versão também?
